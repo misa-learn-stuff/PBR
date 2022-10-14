@@ -1,0 +1,10 @@
+^D:\REPO\PBR\BUILD\CMAKEFILES\309CEC6284870E2BE039ABA3E246544E\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Repo/PBR -BD:/Repo/PBR/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/Repo/PBR/build/PBR.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

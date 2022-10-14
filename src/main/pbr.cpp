@@ -6,6 +6,6 @@ using namespace pbr;
 
 // main program
 int main(int argc, char *argv[]) {
-  cout << "hello" << endl;
+  cout << "Hello, PBR" << endl;
   return 0;
 }
