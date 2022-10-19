@@ -267,14 +267,19 @@ TEST(TestPoint2, Initializer) {
 	EXPECT_EQ(1, p5.x);
 	EXPECT_EQ(2, p5.y);
 
-	const Vector2f v2{ 3, 4 };
-	Point2f p6(v2);
+	const Vector2f v2{ (float)3.2, (float)4.2 };
+	Point2i p6(v2);
 	EXPECT_EQ(3, p6.x);
 	EXPECT_EQ(4, p6.y);
 
 	Vector2f v3 = (Vector2f)p4;
 	EXPECT_EQ(1, v3.x);
 	EXPECT_EQ(2, v3.y);
+
+	const Point3i p7{ 1, 2, 3 };
+	Point2i p8(p7);
+	EXPECT_EQ(1, p8.x);
+	EXPECT_EQ(2, p8.y);
 }
 
 TEST(TestPoint2, Indexer) {
@@ -627,3 +632,185 @@ TEST(TestNormal3, Comparison) {
 }
 
 #pragma endregion Normal3
+
+#pragma region Bounds2
+
+TEST(TestBounds2, Initializer) {
+	constexpr int minNum = numeric_limits<int>::lowest();
+	constexpr int maxNum = numeric_limits<int>::max();
+
+	Bounds2i b1;
+	EXPECT_EQ(Point2i(minNum, minNum), b1.pMin);
+	EXPECT_EQ(Point2i(maxNum, maxNum), b1.pMax);
+
+	Point2i p1(1, 2);
+	Bounds2i b2(p1);
+	EXPECT_EQ(p1, b2.pMin);
+	EXPECT_EQ(p1, b2.pMax);
+
+	Point2i p2(6, 7);
+	Bounds2i b3(p2, p1);
+	EXPECT_EQ(p1, b3.pMin);
+	EXPECT_EQ(p2, b3.pMax);
+}
+
+TEST(TestBounds2, Indexer) {
+	Point2i p1(1, 2);
+	Point2i p2(6, 7);
+	Bounds2i b1(p1, p2);
+	EXPECT_EQ(p1, b1[0]);
+	EXPECT_EQ(p2, b1[1]);
+}
+
+TEST(TestBounds2, Measurements) {
+	Point2i p1(1, 2);
+	Point2i p2(7, 7);
+	Bounds2i b1(p1, p2);
+
+	EXPECT_EQ(Vector2i(6, 5), b1.Diagonal());
+
+	EXPECT_EQ(30, b1.SurfaceArea());
+
+	EXPECT_EQ(0, b1.MaximumExtent());
+}
+
+TEST(TestBounds2, Offset) {
+	Point2f p1(1, 2);
+	Point2f p2(6, 7);
+	Bounds2f b1(p1, p2);
+
+	EXPECT_EQ(Point2f(3.5, 4.5), b1.Lerp(Point2f(0.5, 0.5)));
+
+	EXPECT_EQ(Vector2f(0.5, 0.5), b1.Offset(Point2f(3.5, 4.5)));
+}
+
+TEST(TestBounds2, BoundingSphere) {
+	Point2f p1(1, 2);
+	Point2f p2(6, 7);
+	Bounds2f b1(p1, p2);
+
+	Point2f center;
+	float radius;
+	b1.BoundingSphere(&center, &radius);
+	EXPECT_EQ(Point2f(3.5, 4.5), center);
+}
+
+TEST(TestBounds2, SetOperations) {
+	Bounds2f b1(Point2f(-2, -2), Point2f(5, 5));
+	Bounds2f b2(Point2f(-5, -5), Point2f(2, 2));
+
+	Bounds2f b3 = Union(b1, b2);
+	EXPECT_EQ(Point2f(-5, -5), b3.pMin);
+	EXPECT_EQ(Point2f(5, 5), b3.pMax);
+
+	Bounds2f b4 = Intersect(b1, b2);
+	EXPECT_EQ(Point2f(-2, -2), b4.pMin);
+	EXPECT_EQ(Point2f(2, 2), b4.pMax);
+
+	bool overlap = Overlap(b1, b2);
+	EXPECT_TRUE(overlap);
+
+	bool inside = Inside(Point2f(0, 0), b2);
+	EXPECT_TRUE(inside);
+
+	Bounds2f b5 = Expand(b1, 1);
+	EXPECT_EQ(Point2f(-3, -3), b5.pMin);
+	EXPECT_EQ(Point2f(6, 6), b5.pMax);
+
+	Bounds2f b6 = Expand(b5, 1);
+	EXPECT_EQ(Point2f(-4, -4), b6.pMin);
+	EXPECT_EQ(Point2f(7, 7), b6.pMax);
+}
+
+#pragma endregion Bounds2
+
+#pragma region Bounds3
+
+TEST(TestBounds3, Initializer) {
+	constexpr int minNum = numeric_limits<int>::lowest();
+	constexpr int maxNum = numeric_limits<int>::max();
+
+	Bounds3i b1;
+	EXPECT_EQ(Point3i(minNum, minNum, minNum), b1.pMin);
+	EXPECT_EQ(Point3i(maxNum, maxNum, maxNum), b1.pMax);
+
+	Point3i p1(1, 2, 3);
+	Bounds3i b2(p1);
+	EXPECT_EQ(p1, b2.pMin);
+	EXPECT_EQ(p1, b2.pMax);
+
+	Point3i p2(6, 7, 8);
+	Bounds3i b3(p2, p1);
+	EXPECT_EQ(p1, b3.pMin);
+	EXPECT_EQ(p2, b3.pMax);
+}
+
+TEST(TestBounds3, Indexer) {
+	Point3i p1(1, 2, 3);
+	Point3i p2(6, 7, 8);
+	Bounds3i b1(p1, p2);
+	EXPECT_EQ(p1, b1[0]);
+	EXPECT_EQ(p2, b1[1]);
+}
+
+TEST(TestBounds3, Measurements) {
+	Point3i p1(1, 2, 3);
+	Point3i p2(7, 7, 7);
+	Bounds3i b1(p1, p2);
+
+	EXPECT_EQ(Vector3i(6, 5, 4), b1.Diagonal());
+
+	EXPECT_EQ(120, b1.SurfaceArea());
+
+	EXPECT_EQ(0, b1.MaximumExtent());
+}
+
+TEST(TestBounds3, Offset) {
+	Point3f p1(1, 2, 3);
+	Point3f p2(6, 7, 8);
+	Bounds3f b1(p1, p2);
+
+	EXPECT_EQ(Point3f(3.5, 4.5, 5.5), b1.Lerp(Point3f(0.5, 0.5, 0.5)));
+
+	EXPECT_EQ(Vector3f(0.5, 0.5, 0.5), b1.Offset(Point3f(3.5, 4.5, 5.5)));
+}
+
+TEST(TestBounds3, BoundingSphere) {
+	Point3f p1(1, 2, 3);
+	Point3f p2(6, 7, 8);
+	Bounds3f b1(p1, p2);
+
+	Point3f center;
+	float radius;
+	b1.BoundingSphere(&center, &radius);
+	EXPECT_EQ(Point3f(3.5, 4.5, 5.5), center);
+}
+
+TEST(TestBounds3, SetOperations) {
+	Bounds3f b1(Point3f(-2, -2, -2), Point3f(5, 5, 5));
+	Bounds3f b2(Point3f(-5, -5, -5), Point3f(2, 2, 2));
+
+	Bounds3f b3 = Union(b1, b2);
+	EXPECT_EQ(Point3f(-5, -5, -5), b3.pMin);
+	EXPECT_EQ(Point3f(5, 5, 5), b3.pMax);
+
+	Bounds3f b4 = Intersect(b1, b2);
+	EXPECT_EQ(Point3f(-2, -2, -2), b4.pMin);
+	EXPECT_EQ(Point3f(2, 2, 2), b4.pMax);
+
+	bool overlap = Overlap(b1, b2);
+	EXPECT_TRUE(overlap);
+
+	bool inside = Inside(Point3f(0, 0, 0), b2);
+	EXPECT_TRUE(inside);
+
+	Bounds3f b5 = Expand(b1, 1);
+	EXPECT_EQ(Point3f(-3, -3, -3), b5.pMin);
+	EXPECT_EQ(Point3f(6, 6, 6), b5.pMax);
+
+	Bounds3f b6 = Expand(b5, 1);
+	EXPECT_EQ(Point3f(-4, -4, -4), b6.pMin);
+	EXPECT_EQ(Point3f(7, 7, 7), b6.pMax);
+}
+
+#pragma endregion Bounds3

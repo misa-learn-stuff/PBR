@@ -28,6 +28,7 @@ SET ( SOURCE_CORE
   )
 
 SET ( HEADERS_CORE
+  src/core/pbr.h
   src/core/geometry.h
   src/core/transform.h
   )
